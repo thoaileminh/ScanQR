@@ -14,7 +14,9 @@ import androidx.lifecycle.viewModelScope
 import com.noone.scanqr.R
 import com.noone.scanqr.data.SQRExcel
 import com.noone.scanqr.data.databases.SQRDatabases
+import com.noone.scanqr.utils.SQRConstants
 import com.noone.scanqr.utils.SQRUtils.showLog
+import com.noone.scanqr.utils.convertToNormalIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -31,6 +33,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -168,8 +171,6 @@ class SQRMainViewModel @Inject constructor(
 
                 excelData.postValue(arrayListOf()) // reset data
 
-                clearExcelData()
-
                 // Don't forget to Change to your assets folder excel sheet
                 /* val myInput: InputStream = assets.open("TestExcel.xlsx")
                  val workbook = XSSFWorkbook(myInput)*/
@@ -193,45 +194,50 @@ class SQRMainViewModel @Inject constructor(
 
                     while (cellIterator.hasNext()) {
                         val myCell = cellIterator.next() as XSSFCell
-                        if (myCell.columnIndex == 0 && myCell.rawValue.isNotEmpty()) {
-                            item.index = myCell.rawValue.toIntOrNull()
-                        }
-                        if (myCell.columnIndex == 12 && myCell.rawValue.isNotEmpty()) {
-                            item.label = myCell.toString()
-                        }
-
                         item.fileName = fileName
+
+                        if (myCell.columnIndex == SQRConstants.SQR_COLUM_INDEX && myCell.toString().isNotEmpty()) {
+                            item.index = myCell.toString().convertToNormalIndex()
+                        }
+                        if (myCell.columnIndex == SQRConstants.SQR_COLUM_LABEL && myCell.toString().isNotEmpty()) {
+                            item.label = myCell.toString().convertToNormalIndex()
+                        }
                     }
 
-                    if (item.index != null && item.index != -1) {
+                    if (item.index.isNotEmpty()
+                        && item.index.lowercase(Locale.ROOT) != SQRConstants.SQR_COLUM_INDEX_TEXT.lowercase(Locale.ROOT)
+                    ) {
                         dataList.add(item)
                     }
                 }
                 insertExcelData(dataList)
             } catch (ex: Exception) {
                 showLog("readXLSXFileFromStorage ex: $ex")
-                errorData.postValue("readFileSelected: " + ex.message)
+                errorData.postValue("readFileSelected: ${ex.message}")
                 excelData.postValue(arrayListOf())
             }
         }
     }
 
     private fun insertExcelData(data: ArrayList<SQRExcel>) {
-        showLog("insertExcelData data.size: ${data.size}")
         try {
+            showLog("insertExcelData data.size: ${data.size}")
+
             compositeDisposable.add(
                 database.excelDao().insertSQRExcelData(data)
                     .subscribeOn(Schedulers.io())
                     .subscribe({
                     }, {
-                        errorData.postValue("insertExcelData: " + it.message)
                         showLog("insertExcelData error: $it")
+                        errorData.postValue("insertExcelData: ${it.message}")
+                        excelData.postValue(arrayListOf())
                     })
             )
             excelData.postValue(data)
         } catch (ex: Exception) {
-            errorData.postValue(ex.message)
             showLog("insertExcelData ex: ${"insertExcelData: " + ex.message}")
+            errorData.postValue(ex.message)
+            excelData.postValue(arrayListOf())
         }
     }
 
@@ -250,7 +256,7 @@ class SQRMainViewModel @Inject constructor(
                     }
                 }, { throwable ->
                     excelData.postValue(arrayListOf())
-                    errorData.postValue("getExcelData: " + throwable.message)
+                    errorData.postValue("getExcelData: ${throwable.message}")
                     showLog("getExcelData throwable: $throwable")
                 })
         )
@@ -263,7 +269,7 @@ class SQRMainViewModel @Inject constructor(
                 .subscribe({
                 }, { throwable ->
                     excelData.postValue(arrayListOf())
-                    errorData.postValue("clearExcelData: " + throwable.message)
+                    errorData.postValue("clearExcelData: ${throwable.message}")
                     showLog("getExcelData throwable: $throwable")
                 })
         )

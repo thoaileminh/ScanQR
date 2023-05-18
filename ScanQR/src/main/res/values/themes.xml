@@ -8,9 +8,11 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/sqr_teal_200</item>
         <item name="colorSecondaryVariant">@color/sqr_teal_700</item>
-        <item name="colorOnSecondary">@color/sqr_black</item>
+        <item name="colorOnSecondary">@color/sqr_blue</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>

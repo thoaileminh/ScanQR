@@ -18,10 +18,10 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.noone.scanqr.R
-import com.noone.scanqr.data.SQRExcel
 import com.noone.scanqr.databinding.SqrActivityScanQrBinding
 import com.noone.scanqr.utils.SQRConstants.SQRSCAN_BUNDLE_DATA
 import com.noone.scanqr.utils.SQRUtils.showLog
+import com.noone.scanqr.utils.convertToNormalIndex
 import com.noone.scanqr.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -60,8 +60,8 @@ class SQRScanActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback { result ->
             lifecycleScope.launch(Dispatchers.IO) {
                 showLog("DecodeCallback Scan result: $result")
-                val text = result.text.substring(0, result.text.indexOf('.'))
-                sendBackDataToMain(data = SQRExcel(index = text.toIntOrNull()))
+                val index: String = result.text.convertToNormalIndex()
+                sendBackDataToMain(index = index)
             }
         }
         codeScanner.errorCallback = ErrorCallback { throwable -> // or ErrorCallback.SUPPRESS
@@ -89,10 +89,11 @@ class SQRScanActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun sendBackDataToMain(data: SQRExcel) {
+    private fun sendBackDataToMain(index: String) {
+        showLog("sendBackDataToMain index: $index")
         val resultIntent = Intent()
         val bundle = Bundle().apply {
-            putParcelable(SQRSCAN_BUNDLE_DATA, data)
+            putString(SQRSCAN_BUNDLE_DATA, index)
         }
 
         resultIntent.putExtras(bundle)

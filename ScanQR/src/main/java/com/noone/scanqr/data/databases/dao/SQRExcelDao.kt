@@ -19,9 +19,9 @@ interface SQRExcelDao : SQRBaseDao<SQRExcel> {
     @Query("SELECT * FROM Excel WHERE fileName=:fileName")
     fun getExcelData(fileName: String): Single<List<SQRExcel>>
 
-    @Query("DELETE FROM Excel WHERE `index`=:index")
-    fun deleteItemScanned(
-        index: Int
+    @Query("UPDATE Excel SET `isScanned`= 1 WHERE `index`=:index")
+    fun updateItemScanned(
+        index: String
     ): Single<Int>
 
     @Query("DELETE FROM Excel")

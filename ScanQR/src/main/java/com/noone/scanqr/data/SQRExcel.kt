@@ -17,7 +17,7 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "Excel", primaryKeys = ["index"])
 data class SQRExcel(
     @SerializedName("index")
-    var index: Int? = null,
+    var index: String = "",
 
     @SerializedName("label")
     var label: String? = null,
@@ -33,7 +33,7 @@ data class SQRExcel(
 
     companion object {
         val loadMoreItem = SQRExcel(
-            index = -1,
+            index = "index -1",
             label = "load more",
             viewType = SQRConstants.VIEW_TYPE_EXCEL_ITEM_LOAD_MORE
         )

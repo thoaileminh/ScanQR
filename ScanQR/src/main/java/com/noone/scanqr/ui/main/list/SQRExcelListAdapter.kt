@@ -16,6 +16,7 @@ import com.noone.scanqr.databinding.SqrItemExcelBinding
 import com.noone.scanqr.databinding.SqrItemProgressLoadMoreBinding
 import com.noone.scanqr.utils.SQRConstants.VIEW_TYPE_EXCEL_ITEM
 import com.noone.scanqr.utils.SQRUtils.showLog
+import java.util.Locale
 
 class SQRExcelListAdapter(
     private val mListener: SQRItemExcelListener,
@@ -70,24 +71,23 @@ class SQRExcelListAdapter(
 
     fun getList(): ArrayList<SQRExcel> = listData
 
-    fun findPositionByItemIndex(index: Int?): Int {
-        if (index == null || index < 0) return -1
-
+    fun findPositionByItemIndex(index: String?): Int {
+        if (index.isNullOrEmpty()) return -1
         return try {
             getList().indexOfFirst { item ->
-                index == item.index
+                index.lowercase(Locale.ROOT) == item.index.lowercase(Locale.ROOT)
             }
         } catch (ex: Exception) {
             -1
         }
     }
 
-    fun findItemByItemIndex(index: Int?): SQRExcel? {
-        if (index == null || index < 0) return null
+    fun findItemByItemIndex(index: String?): SQRExcel? {
+        if (index.isNullOrEmpty()) return null
 
         return try {
             getList().find { item ->
-                index == item.index
+                (index.equals(item.index, false))
             }
         } catch (ex: Exception) {
             null
@@ -97,7 +97,6 @@ class SQRExcelListAdapter(
     fun setItemScanned(position: Int) {
         getList()[position].isScanned = true
         notifyItemChanged(position)
-        // removeExcelItem(position)
     }
 
     fun removeExcelItem(position: Int) {

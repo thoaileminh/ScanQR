@@ -22,4 +22,13 @@ object SQRConstants {
     // Share Pref
     const val SQR_PREF: String = "NOONE_SQR_PREF"
     const val SQR_PREF_FILE_PATH: String = "NOONE_SQR_PREF_FILE_PATH"
+
+    // COLUMN
+    const val SQR_COLUM_INDEX: Int = 0
+    const val SQR_COLUM_LABEL: Int = 12
+
+    const val SQR_COLUM_INDEX_TEXT: String = "index"
+    const val SQR_COLUM_LABEL_TEXT: String = "label"
+    const val UTF8_BOM = "\uFEFF"
+
 }

@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/ItemClick"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/sqr_white">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/itemContent"
@@ -18,7 +19,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvItemIndex"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/dp_6"
             android:text="@string/scan_qr_item_index"

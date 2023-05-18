@@ -29,7 +29,7 @@ class SQRItemExcelViewHolder(
             if (item.isScanned) {
                 this.hide()
             } else {
-                tvItemIndex.text = context.getString(R.string.scan_qr_item_index, item.index.toString())
+                tvItemIndex.text = context.getString(R.string.scan_qr_item_index, item.index)
                 tvItemLabel.text = context.getString(R.string.scan_qr_item_label, item.label.orEmpty())
                 show()
                 setOnSingleClickListener {

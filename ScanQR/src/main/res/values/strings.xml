@@ -20,9 +20,18 @@
     <string name="scan_qr_scan_not_exist">Index %s không tồn tại!</string>
     <string name="scan_qr_scan_is_scanned">Index %s đã được scan trước đó!</string>
     <string name="scan_qr_scan_error">Scan index %s bị lỗi!</string>
-    <string name="scan_qr_scan_error_data">Scan data bị lỗi!</string>
-    <string name="scan_qr_scan_version">v%s</string>
+    <string name="scan_qr_scan_error_data">Scan index bị rỗng!</string>
+    <string name="scan_qr_scan_version">v2.0</string>
     <string name="scan_qr_scan_close">Đóng</string>
     <string name="scan_qr_data_empty">Dữ liệu rỗng!</string>
 
+    <!-- Info change log -->
+    <string name="scan_qr_data_info">Thông tin:</string>
+    <string name="scan_qr_info_v1">Version 1: Ngày 15/05/2023:\n
+        - Cho phép chọn file Excel và scan QR.
+    </string>
+    <string name="scan_qr_info_v2">Version 2: Ngày 18/05/2023:\n
+        - Sửa lỗi đọc dữ liệu từ QR và index.\n
+        - Sửa UI DarkTheme.
+    </string>
 </resources>

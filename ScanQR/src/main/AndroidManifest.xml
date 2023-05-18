@@ -54,6 +54,7 @@
         </activity>
 
         <activity android:name=".ui.scanqr.SQRScanActivity" />
+        <activity android:name=".ui.info.SQRInfoActivity" />
     </application>
 
 </manifest>

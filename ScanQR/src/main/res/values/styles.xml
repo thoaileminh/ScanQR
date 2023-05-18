@@ -6,4 +6,8 @@
         <item name="android:focusable">true</item>
         <item name="android:foreground">@drawable/sqr_bg_foreground</item>
     </style>
+
+    <style name="AppTheme.RoundedCornerMaterialButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/sqr_bg_rounded_btn</item>
+    </style>
 </resources>
