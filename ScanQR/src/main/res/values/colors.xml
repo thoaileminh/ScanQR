@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sqr_blue">#2A70DF</color>
+    <color name="sqr_teal_200">#FF03DAC5</color>
+    <color name="sqr_teal_700">#FF018786</color>
+    <color name="sqr_black">#FF000000</color>
+    <color name="sqr_white">#FFFFFFFF</color>
+    <color name="sqr_yellow">#FFBA00</color>
+    <color name="sqr_gray_light">#DADADA</color>
+    <color name="sqr_gray">#BDBDBD</color>
+    <color name="sqr_grey">#A7A7A7</color>
+    <color name="sqr_grey_dark">#8C8C8C</color>
+    <color name="sqr_red">#dd0000</color>
+    <color name="sqr_green">#12A154</color>
+    <color name="sqr_foreground_color_pressed">#88f4f4f4</color>
+</resources>

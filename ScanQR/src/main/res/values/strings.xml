@@ -1,0 +1,28 @@
+<resources>
+    <string name="scan_qr_app_name">ScanQR</string>
+    <string name="scan_qr_select_excel_file">Chọn file Excel</string>
+    <string name="scan_qr_name_select_excel_file">Vui lòng chọn file excel!</string>
+    <string name="scan_qr_name_selected_excel_file">Tên file đang chọn: %s</string>
+    <string name="scan_qr_list_not_scan">Danh sách index chưa scan: %s</string>
+    <string name="scan_qr_name_data">Dữ liệu: %s</string>
+    <string name="scan_qr_name_error">Lỗi: %s</string>
+    <string name="scan_qr_name_empty">Chưa tải xong dữ liệu! Hãy chọn lại file excel.</string>
+    <string name="scan_qr_progressing">Đọc dữ liệu: %s</string>
+    <string name="scan_qr_reading_file_selected_before">Đang đọc dữ liệu…</string>
+    <string name="scan_qr_reading_file_success">Đọc dữ liệu thành công!</string>
+    <string name="scan_qr_btn_scan">Scan QR</string>
+    <string name="scan_qr_index_scanned">Index vừa scan: %s</string>
+    <string name="scan_qr_error">Scan lỗi: %s</string>
+    <string name="scan_qr_item_index">Index: %s</string>
+    <string name="scan_qr_item_label">Label: %s</string>
+    <string name="scan_qr_item_load_more">Đang tải thêm…</string>
+    <string name="scan_qr_scan_success">Scan index %s thành công!</string>
+    <string name="scan_qr_scan_not_exist">Index %s không tồn tại!</string>
+    <string name="scan_qr_scan_is_scanned">Index %s đã được scan trước đó!</string>
+    <string name="scan_qr_scan_error">Scan index %s bị lỗi!</string>
+    <string name="scan_qr_scan_error_data">Scan data bị lỗi!</string>
+    <string name="scan_qr_scan_version">v%s</string>
+    <string name="scan_qr_scan_close">Đóng</string>
+    <string name="scan_qr_data_empty">Dữ liệu rỗng!</string>
+
+</resources>

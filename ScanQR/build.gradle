@@ -1,0 +1,84 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-parcelize'
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.noone.scanqr"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding = true
+    }
+}
+
+dependencies {
+    implementation "androidx.multidex:multidex:${MULTIDEX_VERSION}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${KOTLIN_VERSION}"
+    implementation "androidx.core:core-ktx:${ANDROIDX_CORE_KTX_VERSION}"
+    implementation "androidx.appcompat:appcompat:${ANDROIDX_APPCOMPAT_VERSION}"
+    implementation "com.google.android.material:material:${MATERIAL_VERSION}"
+    implementation "androidx.constraintlayout:constraintlayout:${ANDROIDX_CONSTRAINT_VERSION}"
+
+    implementation "androidx.legacy:legacy-support-v4:${ANDROIDX_LEGACY_SUPPORT_VERSION}"
+    implementation "androidx.paging:paging-runtime-ktx:${ANDROIDX_PAGING_KTX_VERSION}"
+    testImplementation "junit:junit:${JUNIT_VERSION}"
+    androidTestImplementation "androidx.test.ext:junit:${EXT_JUNIT_VERSION}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${ESPRESSO_CORE_VERSION}"
+
+    implementation("com.google.dagger:hilt-android:${DAGGER_HILT_VERSION}")
+    kapt("com.google.dagger:hilt-android-compiler:${DAGGER_HILT_VERSION}")
+
+    implementation "androidx.navigation:navigation-fragment-ktx:${NAVIGATION_VERSION}"
+    implementation "androidx.navigation:navigation-ui-ktx:${NAVIGATION_VERSION}"
+
+    implementation "io.reactivex.rxjava3:rxandroid:${RXJAVA_ANDROID_VERSION}"
+    implementation "io.reactivex.rxjava3:rxjava:${RXJAVA_VERSION}"
+
+    // Read Excel
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+
+    // Pick file
+    implementation 'com.github.HBiSoft:PickiT:2.0.5'
+
+    // Scan QR
+    implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
+
+    kapt "androidx.room:room-compiler:${ANDROIDX_ROOM_VERSION}"
+    implementation "androidx.room:room-rxjava3:${ANDROIDX_ROOM_VERSION}"
+    implementation "androidx.room:room-ktx:${ANDROIDX_ROOM_VERSION}"
+    implementation "com.google.code.gson:gson:${GSON_VERSION}"
+}
