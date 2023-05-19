@@ -13,11 +13,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.budiyev.android.codescanner.AutoFocusMode
+import com.budiyev.android.codescanner.CodeScanner
+import com.budiyev.android.codescanner.DecodeCallback
+import com.budiyev.android.codescanner.ErrorCallback
+import com.budiyev.android.codescanner.ScanMode
 import com.google.android.material.snackbar.Snackbar
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
+import com.noone.scanqr.BuildConfig
 import com.noone.scanqr.R
 import com.noone.scanqr.data.SQRExcel
 import com.noone.scanqr.data.databases.SQRDatabases
@@ -25,19 +32,19 @@ import com.noone.scanqr.databinding.SqrActivityMainBinding
 import com.noone.scanqr.ui.info.SQRInfoActivity
 import com.noone.scanqr.ui.main.list.SQRExcelListAdapter
 import com.noone.scanqr.ui.main.list.SQRItemExcelListener
-import com.noone.scanqr.ui.scanqr.SQRScanActivity
-import com.noone.scanqr.utils.SQRConstants.SQRSCAN_BUNDLE_DATA
 import com.noone.scanqr.utils.SQRPermissionUtils
 import com.noone.scanqr.utils.SQRUtils
 import com.noone.scanqr.utils.SQRUtils.showLog
+import com.noone.scanqr.utils.convertToNormalIndex
 import com.noone.scanqr.utils.gravityTop
+import com.noone.scanqr.utils.hide
 import com.noone.scanqr.utils.setOnSingleClickListener
+import com.noone.scanqr.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
@@ -47,11 +54,17 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
     private lateinit var viewBinding: SqrActivityMainBinding
 
     private var pickit: PickiT? = null
+    private lateinit var codeScanner: CodeScanner
 
     private var adapter: SQRExcelListAdapter? = null
 
     private var sqrDatabases: SQRDatabases? = null
     private val compositeDisposable = CompositeDisposable()
+
+    private var currentResult: com.google.zxing.Result? = null
+    private var currentMessage: String = ""
+    private lateinit var currentSnackBar: Snackbar
+    private var isShowingScanQR: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +72,13 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
         setContentView(viewBinding.root)
 
         setUpUI()
+        setUpSanQR()
         setUpViewModel()
     }
 
     private fun setUpUI() {
+        setUpSnackBar()
+
         sqrDatabases = SQRDatabases.getInstance(this)
         pickit = PickiT(this, this, this)
 
@@ -71,6 +87,13 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
         loadLocalBDIfExist()
 
         viewBinding.run {
+            tvInfo.apply {
+                text = getString(R.string.scan_qr_scan_version, BuildConfig.VERSION_NAME)
+                setOnSingleClickListener {
+                    gotoActivityInfo()
+                }
+            }
+
             btnSelectExcelFile.setOnSingleClickListener {
                 gotoSelectExcelFile()
             }
@@ -79,11 +102,9 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
                 gotoScanQRActivity()
             }
 
-            tvInfo.apply {
-                text = getString(R.string.scan_qr_scan_version)
-                setOnSingleClickListener {
-                    gotoActivityInfo()
-                }
+            btnCloseScanView.setOnSingleClickListener {
+                isShowingScanQR = false
+                viewBinding.layoutScannerView.hide()
             }
         }
     }
@@ -93,14 +114,14 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
             excelData.observe(this@SQRMainActivity) { data ->
                 if (data != null && data.isNotEmpty()) {
                     viewBinding.tvProgress.text = getString(R.string.scan_qr_reading_file_success)
-                    viewBinding.tvListNotScan.visibility = View.VISIBLE
-                    viewBinding.tvListNotScan.text = getString(R.string.scan_qr_list_not_scan, data.size.toString())
-                    adapter?.setList(ArrayList(data))
+                    adapter?.let { adapter ->
+                        adapter.setList(ArrayList(data))
+                        showTotalNumbers()
+                    }
+
                     SQRUtils.saveFilePath(context = this@SQRMainActivity, filePath = viewModel.filePath.orEmpty()) {}
                 } else {
-                    viewBinding.tvListNotScan.text = ""
-                    viewBinding.tvIndexScanned.text = ""
-                    adapter?.clear()
+                    hideTotalNumbers()
                 }
             }
 
@@ -108,6 +129,31 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
                 viewBinding.tvProgress.text = getString(R.string.scan_qr_name_error, error)
             }
         }
+    }
+
+    private fun showTotalNumbers() {
+        viewBinding.run {
+            // total items of list
+            tvListTotal.visibility = View.VISIBLE
+            tvListTotalNumber.visibility = View.VISIBLE
+            tvListTotalNumber.text = adapter?.getTotalItems().toString()
+
+            // total items not scan of list
+            tvListTotalNotScan.visibility = View.VISIBLE
+            tvListTotalNotScanNumber.visibility = View.VISIBLE
+            tvListTotalNotScanNumber.text = adapter?.getTotalItemsNotScan().toString()
+        }
+    }
+
+    private fun hideTotalNumbers() {
+        viewBinding.run {
+            tvListTotal.text = ""
+            tvListTotalNotScan.text = ""
+            tvListTotalNumber.text = ""
+            tvListTotalNotScanNumber.text = ""
+            tvIndexScanned.text = ""
+        }
+        adapter?.clear()
     }
 
     private fun loadLocalBDIfExist() {
@@ -135,8 +181,9 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
 
     private fun gotoScanQRActivity() {
         if (SQRPermissionUtils().checkPermissionsAtRuntime(this@SQRMainActivity)) {
-            val intent = Intent(this@SQRMainActivity, SQRScanActivity::class.java)
-            resultLauncherScanQR.launch(intent)
+            isShowingScanQR = true
+            viewBinding.layoutScannerView.show()
+            codeScanner.startPreview()
         } else {
             SQRPermissionUtils().requestPermissions(this@SQRMainActivity)
         }
@@ -148,13 +195,6 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
 
         viewModel.fileName = SQRUtils.getFileName(uri = uri, activity = this).orEmpty()
         viewBinding.tvNameFileSelected.text = getString(R.string.scan_qr_name_selected_excel_file, viewModel.fileName)
-    }
-
-    private fun getDataScanQR(data: Intent?) {
-        data.let {
-            val index = data?.getStringExtra(SQRSCAN_BUNDLE_DATA)
-            checkDataItemScanned(index)
-        }
     }
 
     private fun selectExcelFile() {
@@ -217,6 +257,52 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
         }
     }
 
+    private fun setUpSanQR() {
+        codeScanner = CodeScanner(this, viewBinding.viewScanner)
+
+        // Parameters (default values)
+        codeScanner.camera = CodeScanner.CAMERA_BACK // or CAMERA_FRONT or specific camera id
+        codeScanner.formats = CodeScanner.ALL_FORMATS // list of type BarcodeFormat, ex. listOf(BarcodeFormat.QR_CODE)
+        codeScanner.autoFocusMode = AutoFocusMode.SAFE // or CONTINUOUS
+        codeScanner.scanMode = ScanMode.CONTINUOUS // or CONTINUOUS or PREVIEW
+        codeScanner.isAutoFocusEnabled = true // Whether to enable auto focus or not
+        codeScanner.isFlashEnabled = false // Whether to enable flash or not
+
+        // Callbacks
+        codeScanner.decodeCallback = DecodeCallback { result ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (currentResult?.text == result.text && currentSnackBar.isShown) return@launch
+
+                showLog("DecodeCallback Scan result: $result")
+                val index: String = result.text.convertToNormalIndex()
+                currentResult = result
+                checkDataItemScanned(index)
+            }
+        }
+
+        codeScanner.errorCallback = ErrorCallback { throwable -> // or ErrorCallback.SUPPRESS
+            lifecycleScope.launch(Dispatchers.IO) {
+                showLog("DecodeCallback Scan throwable: $throwable")
+                showStateScanError(throwable.message.orEmpty())
+            }
+        }
+
+        viewBinding.viewScanner.setOnSingleClickListener {
+            codeScanner.startPreview()
+        }
+    }
+
+    private fun setUpSnackBar() {
+        viewBinding.run {
+            currentSnackBar = Snackbar.make(viewBinding.root, currentMessage, Snackbar.LENGTH_INDEFINITE).apply {
+                gravityTop()
+                setAction(getString(R.string.scan_qr_scan_close)) {
+                    dismiss()
+                }
+            }
+        }
+    }
+
     private fun checkDataItemScanned(index: String?) {
         lifecycleScope.launch(Dispatchers.Main) {
             adapter?.let { adapter ->
@@ -238,7 +324,7 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
                             viewModel.database.excelDao().updateItemScanned(index)
                                 .subscribeOn(Schedulers.io())
                                 .subscribe({
-                                    showStateScanSuccess(position, index)
+                                    showStateScanSuccess(position, getString(R.string.scan_qr_scan_success, index))
                                 }, { throwable ->
                                     showLog("setItemScanned throwable: $throwable")
                                     showStateScanError(getString(R.string.scan_qr_scan_error, index))
@@ -257,45 +343,41 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
         }
     }
 
-    private val resultLauncherScanQR = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        showLog("resultLauncherScanQR result: $result")
-        if (result.resultCode == RESULT_OK) {
-            getDataScanQR(result.data)
-        }
-    }
-
-    private fun showStateScanSuccess(position: Int, index: String) {
+    private fun showStateScanSuccess(position: Int, message: String) {
         lifecycleScope.launch {
-            val message = getString(R.string.scan_qr_scan_success, index)
-            adapter?.setItemScanned(position)
-            viewBinding.tvIndexScanned.text = message
+            if (currentMessage == message) return@launch
+
+            adapter?.let { adapter ->
+                adapter.setItemScanned(position)
+                showTotalNumbers()
+            }
+
+            viewBinding.tvIndexScanned.text = currentMessage
             viewBinding.tvIndexScanned.setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_green))
 
-            val snack = Snackbar.make(viewBinding.root, message, Snackbar.LENGTH_SHORT)
-            snack.setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_white))
-            snack.setBackgroundTint(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_green))
-            snack.gravityTop()
-            snack.setAction(getString(R.string.scan_qr_scan_close)) {
-                snack.dismiss()
+            currentSnackBar.apply {
+                setText(message)
+                setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_white))
+                setBackgroundTint(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_green))
+                show()
             }
-            snack.show()
         }
     }
-
 
     private fun showStateScanError(message: String) {
         lifecycleScope.launch {
-            viewBinding.tvIndexScanned.text = message
+            if (currentMessage == message) return@launch
+
+            currentMessage = message
+            viewBinding.tvIndexScanned.text = currentMessage
             viewBinding.tvIndexScanned.setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_red))
 
-            val snack = Snackbar.make(viewBinding.root, message, Snackbar.LENGTH_SHORT)
-            snack.setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_white))
-            snack.setBackgroundTint(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_red))
-            snack.gravityTop()
-            snack.setAction(getString(R.string.scan_qr_scan_close)) {
-                snack.dismiss()
+            currentSnackBar.apply {
+                setText(message)
+                setTextColor(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_white))
+                setBackgroundTint(ContextCompat.getColor(this@SQRMainActivity, R.color.sqr_red))
+                show()
             }
-            snack.show()
         }
     }
 
@@ -305,7 +387,11 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        exitProcess(0)
+        if (viewBinding.layoutScannerView.isVisible || isShowingScanQR) {
+            isShowingScanQR = false
+            viewBinding.layoutScannerView.hide()
+        } else {
+            super.onBackPressed()
+        }
     }
 }

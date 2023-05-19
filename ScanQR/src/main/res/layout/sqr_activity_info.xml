@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="@dimen/dp_8"
-        android:paddingEnd="@dimen/dp_8">
+        android:padding="@dimen/dp_16">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvInfo"
@@ -24,20 +23,11 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvVersion2"
+            android:id="@+id/tvVersionChanged"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_16"
-            android:text="@string/scan_qr_info_v2"
-            android:textColor="@color/sqr_black"
-            android:textSize="@dimen/sp_12" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvVersion1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_16"
-            android:text="@string/scan_qr_info_v1"
+            android:layout_marginTop="@dimen/dp_8"
+            android:text="@string/scan_qr_info_changed"
             android:textColor="@color/sqr_black"
             android:textSize="@dimen/sp_12" />
 

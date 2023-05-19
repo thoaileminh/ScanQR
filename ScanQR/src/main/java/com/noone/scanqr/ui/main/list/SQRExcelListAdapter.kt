@@ -104,6 +104,9 @@ class SQRExcelListAdapter(
         notifyItemRemoved(position)
     }
 
+    fun getTotalItems(): Int = getList().filter { it.viewType == VIEW_TYPE_EXCEL_ITEM }.size
+    fun getTotalItemsNotScan(): Int = getList().filter { !it.isScanned }.size
+
     fun addLoadMoreItem() {
         hideLoadMoreItem()
         if (listData.contains(loadMoreItem).not()) {

@@ -49,8 +49,38 @@
         tools:text="@string/scan_qr_progressing" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvListNotScan"
-        android:layout_width="match_parent"
+        android:id="@+id/tvListTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_4"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:text="@string/scan_qr_list_total"
+        android:textColor="@color/sqr_black"
+        android:textSize="@dimen/sp_12"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvProgress"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvListTotalNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_4"
+        android:text="0"
+        android:textColor="@color/sqr_black"
+        android:textSize="@dimen/sp_14"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tvListTotal"
+        app:layout_constraintStart_toEndOf="@+id/tvListTotal"
+        app:layout_constraintTop_toTopOf="@+id/tvListTotal"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvListTotalNotScan"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_16"
         android:layout_marginTop="@dimen/dp_4"
@@ -60,7 +90,22 @@
         android:textSize="@dimen/sp_12"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvProgress"
+        app:layout_constraintTop_toBottomOf="@+id/tvListTotal"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvListTotalNotScanNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_4"
+        android:text="0"
+        android:textColor="@color/sqr_black"
+        android:textSize="@dimen/sp_14"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tvListTotalNotScan"
+        app:layout_constraintStart_toEndOf="@+id/tvListTotalNotScan"
+        app:layout_constraintTop_toTopOf="@+id/tvListTotalNotScan"
         tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -75,7 +120,7 @@
         android:textSize="@dimen/sp_18"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvListNotScan"
+        app:layout_constraintTop_toBottomOf="@+id/tvListTotalNotScan"
         tools:text="@string/scan_qr_index_scanned" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -138,4 +183,32 @@
             app:iconTint="@color/sqr_white" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <FrameLayout
+        android:id="@+id/layoutScannerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <com.budiyev.android.codescanner.CodeScannerView
+            android:id="@+id/viewScanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCloseScanView"
+            style="@style/AppTheme.RoundedCornerMaterialButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="@dimen/dp_32"
+            android:text="@string/scan_qr_btn_close"
+            android:textColor="@color/sqr_white"
+            android:textStyle="bold"
+            app:icon="@drawable/sqr_ic_close"
+            app:iconGravity="textStart"
+            app:iconSize="@dimen/dp_24"
+            app:iconTint="@color/sqr_white" />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
