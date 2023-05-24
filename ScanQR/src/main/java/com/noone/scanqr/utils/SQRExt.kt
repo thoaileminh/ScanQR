@@ -5,6 +5,14 @@ package com.noone.scanqr.utils
  * Created by NoOne. on 15/05/2023.
  */
 
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.CATEGORY_DEFAULT
+import android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.Intent.FLAG_ACTIVITY_NO_HISTORY
+import android.net.Uri
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -91,4 +99,17 @@ private fun characterCompare(lhs: String, rhs: String): Int {
         i++
     }
     return if (i < lhs.length || i < rhs.length) i else -1
+}
+
+fun Context.openAppSettings() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    with(intent) {
+        data = Uri.fromParts("package", packageName, null)
+        addCategory(CATEGORY_DEFAULT)
+        addFlags(FLAG_ACTIVITY_NEW_TASK)
+        addFlags(FLAG_ACTIVITY_NO_HISTORY)
+        addFlags(FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+    }
+
+    startActivity(intent)
 }

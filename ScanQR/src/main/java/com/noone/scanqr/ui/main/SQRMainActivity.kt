@@ -5,10 +5,11 @@ package com.noone.scanqr.ui.main
  * Created by NoOne. on 15/05/2023.
  */
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.View
+import android.view.ContextThemeWrapper
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +39,8 @@ import com.noone.scanqr.utils.SQRUtils.showLog
 import com.noone.scanqr.utils.convertToNormalIndex
 import com.noone.scanqr.utils.gravityTop
 import com.noone.scanqr.utils.hide
+import com.noone.scanqr.utils.invisible
+import com.noone.scanqr.utils.openAppSettings
 import com.noone.scanqr.utils.setOnSingleClickListener
 import com.noone.scanqr.utils.show
 import dagger.hilt.android.AndroidEntryPoint
@@ -133,25 +136,26 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
 
     private fun showTotalNumbers() {
         viewBinding.run {
+            layoutLoading.hide()
             // total items of list
-            tvListTotal.visibility = View.VISIBLE
-            tvListTotalNumber.visibility = View.VISIBLE
+            tvListTotal.show()
+            tvListTotalNumber.show()
             tvListTotalNumber.text = adapter?.getTotalItems().toString()
 
             // total items not scan of list
-            tvListTotalNotScan.visibility = View.VISIBLE
-            tvListTotalNotScanNumber.visibility = View.VISIBLE
+            tvListTotalNotScan.show()
+            tvListTotalNotScanNumber.show()
             tvListTotalNotScanNumber.text = adapter?.getTotalItemsNotScan().toString()
         }
     }
 
     private fun hideTotalNumbers() {
         viewBinding.run {
-            tvListTotal.text = ""
-            tvListTotalNotScan.text = ""
-            tvListTotalNumber.text = ""
-            tvListTotalNotScanNumber.text = ""
-            tvIndexScanned.text = ""
+            tvListTotal.invisible()
+            tvListTotalNotScan.invisible()
+            tvListTotalNumber.invisible()
+            tvListTotalNotScanNumber.invisible()
+            tvIndexScanned.invisible()
         }
         adapter?.clear()
     }
@@ -175,6 +179,7 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
         if (SQRPermissionUtils().checkPermissionsAtRuntime(this@SQRMainActivity)) {
             selectExcelFile()
         } else {
+            showPopUpSettingPermission()
             SQRPermissionUtils().requestPermissions(this@SQRMainActivity)
         }
     }
@@ -185,6 +190,7 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
             viewBinding.layoutScannerView.show()
             codeScanner.startPreview()
         } else {
+            showPopUpSettingPermission()
             SQRPermissionUtils().requestPermissions(this@SQRMainActivity)
         }
     }
@@ -209,7 +215,13 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
     override fun PickiTonStartListener() = Unit
 
     override fun PickiTonProgressUpdate(progress: Int) {
-        viewBinding.tvProgress.text = getString(R.string.scan_qr_progressing, progress.toString().plus("%"))
+        if (progress < 100) {
+            viewBinding.layoutLoading.show()
+        }
+        viewBinding.apply {
+            tvProgressLoading.text = getString(R.string.scan_qr_progressing, progress.toString().plus("%"))
+            tvProgress.text = getString(R.string.scan_qr_progressing, progress.toString().plus("%"))
+        }
     }
 
     override fun PickiTonCompleteListener(
@@ -379,6 +391,19 @@ class SQRMainActivity : AppCompatActivity(), PickiTCallbacks {
                 show()
             }
         }
+    }
+
+    private fun showPopUpSettingPermission() {
+        AlertDialog.Builder(ContextThemeWrapper(this, R.style.ThemeOverlay_MaterialComponents_Dialog))
+            .setCancelable(false)
+            .setTitle(getString(R.string.scan_qr_permission_title))
+            .setMessage(getString(R.string.scan_qr_permission_des))
+            .setPositiveButton(getString(R.string.scan_qr_permission_ok)) { _, _ ->
+                openAppSettings()
+            }
+            //.setNegativeButton(android.R.string.no, null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show()
     }
 
     private fun gotoActivityInfo() {

@@ -8,7 +8,7 @@
     <string name="scan_qr_name_data">Dữ liệu: %s</string>
     <string name="scan_qr_name_error">Lỗi: %s</string>
     <string name="scan_qr_name_empty">Chưa tải xong dữ liệu! Hãy chọn lại file excel.</string>
-    <string name="scan_qr_progressing">Đọc dữ liệu: %s</string>
+    <string name="scan_qr_progressing">Đang đọc dữ liệu: %s</string>
     <string name="scan_qr_reading_file_selected_before">Đang đọc dữ liệu…</string>
     <string name="scan_qr_reading_file_success">Đọc dữ liệu thành công!</string>
     <string name="scan_qr_btn_scan">Scan QR</string>
@@ -27,18 +27,27 @@
     <string name="scan_qr_data_empty">Dữ liệu rỗng!</string>
     <string name="scan_qr_btn_close">Đóng Scan</string>
 
+    <string name="scan_qr_permission_title">Vui lòng cấp quyền cho ứng dụng</string>
+    <string name="scan_qr_permission_des">Vào Cài đặt -> Ứng dụng -> ScanQR -> Quyền -> Cho phép các quyền</string>
+    <string name="scan_qr_permission_ok">Vào Cài đặt</string>
+
     <!-- Info change log -->
     <string name="scan_qr_data_info">Thông tin phiên bản:</string>
     <string name="scan_qr_info_changed">
-         Version 3.0: Ngày 19/05/2023:\n
+        Version 4: Ngày 24/05/2023:\n
+        - Hiện text tổng số index, tổng số index sau khi đọc file.\n
+        - Hiện loading đang đọc dữ liệu.\n
+        - Hiện popup hướng dẫn cấp quyền cho app.\n\n
+
+         Version 3: Ngày 19/05/2023:\n
         - Cập nhật số tổng số index, tổng số index chưa được scan.\n
         - Cho phép scan liên tục nhiều mã QR.\n\n
 
-         Version 2.0: Ngày 18/05/2023:\n
+         Version 2: Ngày 18/05/2023:\n
         - Sửa lỗi đọc dữ liệu từ QR và index.\n
         - Sửa UI DarkTheme.\n\n
 
-        Version 1.0: Ngày 15/05/2023:\n
+        Version 1: Ngày 15/05/2023:\n
         - Cho phép chọn file Excel và scan QR.
     </string>
 </resources>
